@@ -1,3 +1,4 @@
+from app.schemas.experiment import ExperimentCreate
 
 from sqlalchemy.orm import Session
 
@@ -22,3 +23,17 @@ class ExperimentService:
 
         raise ExperimentNotFoundError(
             f"Experiment {experiment_id} not found")
+
+    def create(
+            self,
+            db: Session,
+            data: ExperimentCreate,
+) -> Experiment:
+        try:
+            experiment = self.repository.create(db, data)
+            db.commit()
+            db.refresh(experiment)
+            return experiment
+        except Exception:
+            db.rollback()
+            raise
