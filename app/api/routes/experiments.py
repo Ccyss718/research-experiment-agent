@@ -82,8 +82,25 @@ def update_experiment(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Experiment not found"
-        )
+        )from exc
 
+@router.delete(
+    "/{experiment_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_experiment(
+        experiment_id: int,
+        db: Session = Depends(get_db)
+) -> None:
+    service = ExperimentService()
+
+    try:
+        service.delete(db, experiment_id)
+    except ExperimentNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Experiment not found"
+        )from exc
 
 
 

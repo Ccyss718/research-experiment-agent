@@ -59,3 +59,11 @@ class ExperimentRepository:
         db.flush()
         db.refresh(experiment)
         return experiment
+
+    def delete(
+            self,
+            db: Session,
+            experiment: Experiment,
+    ) -> None:
+        db.delete(experiment)
+        db.flush()

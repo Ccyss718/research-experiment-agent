@@ -65,3 +65,17 @@ class ExperimentService:
         except Exception:
             db.rollback()
             raise
+
+    def delete(
+            self,
+            db: Session,
+            experiment_id: int,
+    ) -> None:
+        try:
+            experiment = self.get_by_id(db, experiment_id)
+            self.repository.delete(db,experiment)
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        
