@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.schemas.experiment import ExperimentResponse
+from app.schemas.experiment import ExperimentResponse, ExperimentCreate
 from app.services.experiment import (
     ExperimentNotFoundError,
     ExperimentService,
@@ -32,6 +32,19 @@ def get_experiment(
         ) from exc
     # 保留异常原因记录
     return result
+
+@router.post(
+    "/",
+    response_model=ExperimentResponse,
+    status_code=status.HTTP_201_CREATED
+)
+def create_experiment(
+        data: ExperimentCreate,
+        db: Session = Depends(get_db)
+):
+    service = ExperimentService()
+    return service.create(db, data)
+
 
 
 
