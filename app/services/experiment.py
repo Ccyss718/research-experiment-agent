@@ -1,4 +1,4 @@
-from app.schemas.experiment import ExperimentCreate
+from app.schemas.experiment import ExperimentCreate, ExperimentUpdate
 
 from sqlalchemy.orm import Session
 
@@ -31,6 +31,34 @@ class ExperimentService:
 ) -> Experiment:
         try:
             experiment = self.repository.create(db, data)
+            db.commit()
+            db.refresh(experiment)
+            return experiment
+        except Exception:
+            db.rollback()
+            raise
+
+    def list(
+            self,
+            db: Session,
+            skip: int = 0,
+            limit: int = 100,
+    ) -> list[Experiment]:
+        return self.repository.list(
+            db,
+            skip=skip,
+            limit=limit,
+        )
+
+    def update(
+            self,
+            db: Session,
+            experiment_id: int,
+            data: ExperimentUpdate
+    ) -> Experiment:
+        try:
+            experiment = self.get_by_id(db, experiment_id)
+            experiment = self.repository.update(db,experiment, data)
             db.commit()
             db.refresh(experiment)
             return experiment

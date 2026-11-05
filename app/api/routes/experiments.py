@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import Query, APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.schemas.experiment import ExperimentResponse, ExperimentCreate
+from app.schemas.experiment import ExperimentResponse, ExperimentCreate, ExperimentUpdate
 from app.services.experiment import (
     ExperimentNotFoundError,
     ExperimentService,
@@ -44,6 +44,45 @@ def create_experiment(
 ):
     service = ExperimentService()
     return service.create(db, data)
+
+@router.get(
+    "/",
+    response_model=list[ExperimentResponse]
+)
+def list_experiment(
+        skip: int = Query(default=0, ge=0),
+        limit: int = Query(default=100, ge=1, le=100),
+        db: Session = Depends(get_db),
+):
+    service = ExperimentService()
+    return service.list(
+        db,
+        skip=skip,
+        limit=limit
+    )
+
+@router.patch(
+    "/{experiment_id}",
+    response_model=ExperimentResponse,
+)
+def update_experiment(
+        experiment_id: int,
+        data: ExperimentUpdate,
+        db: Session = Depends(get_db)
+):
+    service = ExperimentService()
+
+    try:
+        return service.update(
+            db,
+            experiment_id,
+            data,
+        )
+    except ExperimentNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Experiment not found"
+        )
 
 
 
