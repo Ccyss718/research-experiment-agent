@@ -1,361 +1,299 @@
-# Issue Tracker API
+# Research Experiment API
 
-A RESTful API for managing and tracking issues built with FastAPI and SQLAlchemy.
+科研实验记录管理后端，当前用于记录实验基本信息，并为后续的实验运行、指标分析和科研 Agent 扩展提供稳定的后端基础。
 
-## Features
+本项目基于开源 Issue Reporting and Tracking API 重构而来。原始项目保存在同级目录 `original-project`，当前仓库只维护科研实验领域的重构代码。
 
-- ✅ Create, Read, Update, Delete (CRUD) operations for issues
-- ✅ Issue status tracking (Open, In Progress, Resolved, Closed)
-- ✅ Priority levels (Low, Medium, High, Critical)
-- ✅ Filtering and pagination support
-- ✅ Automatic API documentation (Swagger UI)
-- ✅ Input validation with Pydantic
-- ✅ SQLite database (easy setup, no external dependencies)
+## 当前状态
 
+当前版本已经完成：
 
+- `Experiment` 模型；
+- SQLAlchemy 2.x ORM；
+- Alembic 初始迁移；
+- Experiment CRUD API；
+- Pydantic 输入输出模型分离；
+- Repository、Service、API Router 分层；
+- SQLite 测试数据库；
+- PostgreSQL 本地环境连接和迁移验证；
+- pytest Schema、Repository、Service 和 API 测试。
 
+Docker 配置文件已经准备，但由于当前 Docker Hub 网络连接不稳定，镜像构建尚未完成最终验证。Docker 部分会在网络恢复后补充提交。
 
-<img width="1350" height="684" alt="swagger tracker 1" src="https://github.com/user-attachments/assets/9e88f723-26ee-4ab2-ac96-289f00801936" />
+## 技术栈
 
+- Python 3.11
+- FastAPI
+- Pydantic 2
+- PostgreSQL
+- SQLAlchemy 2.x
+- Alembic
+- pytest
+- Docker / Docker Compose
+- Uvicorn
 
+## 项目结构
 
-
-
-
-
-
-
-
-<img width="1351" height="688" alt="swagger tracker 2" src="https://github.com/user-attachments/assets/40dcad1c-76de-44ec-b5e5-d03acc17fe30" />
-
-
-
-## Quick Start
-
-### Prerequisites
-
-- Python 3.8 or higher
-- pip (Python package manager)
-
-### Installation
-
-1. **Clone or create the project directory:**
-```bash
-mkdir issue-tracker
-cd issue-tracker
-```
-
-2. **Create a virtual environment (recommended):**
-```bash
-# On Windows
-python -m venv venv
-venv\Scripts\activate
-
-# On macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. **Install dependencies:**
-```bash
-pip install -r requirements.txt
-```
-
-4. **Run the application:**
-```bash
-uvicorn app.main:app --reload
-```
-
-The API will be available at: `http://localhost:8000`
-
-### Accessing the Documentation
-
-- **Swagger UI (Interactive):** http://localhost:8000/docs
-- **ReDoc (Alternative):** http://localhost:8000/redoc
-- **Root Endpoint:** http://localhost:8000/
-
-## API Endpoints
-
-### Create an Issue
-```bash
-POST /issues/
-Content-Type: application/json
-
-{
-  "title": "Login button not working",
-  "description": "When users click login, nothing happens",
-  "status": "open",
-  "priority": "high",
-  "reporter": "john@example.com",
-  "assignee": "jane@example.com"
-}
-```
-
-### List All Issues
-```bash
-GET /issues/
-# With filters:
-GET /issues/?status=open&priority=high&skip=0&limit=10
-```
-
-### Get Specific Issue
-```bash
-GET /issues/1
-```
-
-### Update Issue (Full Update)
-```bash
-PUT /issues/1
-Content-Type: application/json
-
-{
-  "title": "Updated title",
-  "description": "Updated description",
-  "status": "in_progress",
-  "priority": "medium",
-  "reporter": "john@example.com",
-  "assignee": "jane@example.com"
-}
-```
-
-### Partial Update
-```bash
-PATCH /issues/1
-Content-Type: application/json
-
-{
-  "status": "resolved"
-}
-```
-
-### Delete Issue
-```bash
-DELETE /issues/1
-```
-
-## Testing with cURL
-
-### Create an issue:
-```bash
-curl -X POST "http://localhost:8000/issues/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Database connection error",
-    "description": "Cannot connect to production database",
-    "status": "open",
-    "priority": "critical",
-    "reporter": "admin@example.com"
-  }'
-```
-
-### List issues:
-```bash
-curl "http://localhost:8000/issues/"
-```
-
-### Get specific issue:
-```bash
-curl "http://localhost:8000/issues/1"
-```
-
-### Update issue status:
-```bash
-curl -X PATCH "http://localhost:8000/issues/1" \
-  -H "Content-Type: application/json" \
-  -d '{"status": "resolved"}'
-```
-
-## Project Structure
-
-```
-issue-tracker/
+```text
+research-experiment-agent/
 ├── app/
-│   ├── __init__.py          # Makes app a package
-│   ├── main.py              # FastAPI application entry point
-│   ├── database.py          # Database connection and session management
-│   ├── models.py            # SQLAlchemy database models (tables)
-│   ├── schemas.py           # Pydantic models for request/response validation
-│   └── routes/
-│       ├── __init__.py      # Makes routes a package
-│       └── issues.py        # Issue-related API endpoints
-├── requirements.txt         # Python dependencies
-├── issues.db               # SQLite database (created automatically)
-└── README.md               # This file
+│   ├── api/routes/experiments.py
+│   ├── core/config.py
+│   ├── db/base.py
+│   ├── db/session.py
+│   ├── models/experiment.py
+│   ├── repositories/experiment.py
+│   ├── schemas/experiment.py
+│   ├── services/experiment.py
+│   └── main.py
+├── alembic/
+│   ├── versions/
+│   └── env.py
+├── tests/
+│   ├── conftest.py
+│   ├── test_experiment_api.py
+│   ├── test_experiment_repository.py
+│   ├── test_experiment_schema.py
+│   └── test_experiment_service.py
+├── alembic.ini
+├── pytest.ini
+├── requirements.txt
+├── requirements-dev.txt
+├── .env.example
+└── README.md
 ```
 
-## Environment Variables (Optional)
+## 领域模型
 
-Create a `.env` file in the root directory:
+当前阶段只实现 `Experiment`，避免一次引入过多业务表。
 
+| 字段 | 说明 |
+|---|---|
+| `id` | 实验主键 |
+| `name` | 实验名称 |
+| `description` | 实验描述，可为空 |
+| `hypothesis` | 实验假设，可为空 |
+| `status` | `planned`、`running`、`completed`、`archived`、`failed` |
+| `created_at` | 创建时间 |
+| `updated_at` | 更新时间 |
+
+## 环境要求
+
+- Python 3.11；
+- Git；
+- PostgreSQL，或 Docker Desktop；
+- PowerShell、Bash 或其他终端。
+
+Python 3.13 可能触发部分依赖的本地编译问题，因此当前项目固定使用 Python 3.11 虚拟环境。
+
+## 本地安装
+
+在项目根目录执行：
+
+```powershell
+python -m venv .venv311
+.\\.venv311\\Scripts\\Activate.ps1
+python -m pip install -r requirements-dev.txt
 ```
-DATABASE_URL=sqlite:///./issues.db
-API_HOST=0.0.0.0
+
+## 环境变量
+
+复制模板：
+
+```powershell
+Copy-Item .env.example .env
+```
+
+`.env.example` 只保存变量名称和非敏感示例。`.env` 保存本机真实配置，已加入 `.gitignore`，不要提交或发送其内容。
+
+主要变量：
+
+```env
+APP_NAME=Research Experiment API
+APP_ENV=development
+API_HOST=127.0.0.1
 API_PORT=8000
+DATABASE_URL=
+POSTGRES_DB=research_experiment
+POSTGRES_USER=research_experiment
+POSTGRES_PASSWORD=
 ```
 
-## Deployment Options
+使用 PostgreSQL 时，把本机的 `DATABASE_URL` 设置为：
 
-### 1. Deploy to Render (Free Tier)
-
-1. Create a `render.yaml`:
-```yaml
-services:
-  - type: web
-    name: issue-tracker-api
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```text
+postgresql+psycopg://用户名:本地密码@127.0.0.1:5433/数据库名
 ```
 
-2. Push to GitHub
-3. Connect to Render and deploy
+如果 `DATABASE_URL` 留空，当前开发配置会回退到项目目录下的 SQLite 数据库 `experiment.db`。
 
-### 2. Deploy to Railway
+不要把真实密码写入 README、日志、提交记录或问题反馈中。
 
-1. Install Railway CLI: `npm i -g @railway/cli`
-2. Login: `railway login`
-3. Initialize: `railway init`
-4. Deploy: `railway up`
+## 数据库迁移
 
-### 3. Deploy to Fly.io
+查看当前迁移版本：
 
-1. Install Fly CLI
-2. Create `fly.toml`
-3. Run: `fly launch`
-
-### 4. Docker Deployment
-
-Create a `Dockerfile`:
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 8000
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```powershell
+python -m alembic current
 ```
 
-Build and run:
-```bash
-docker build -t issue-tracker .
-docker run -p 8000:8000 issue-tracker
+执行全部迁移：
+
+```powershell
+python -m alembic upgrade head
 ```
 
-## Development Tips
+创建新的自动迁移：
 
-### Enable Auto-reload
-The `--reload` flag automatically restarts the server when code changes:
-```bash
-uvicorn app.main:app --reload
+```powershell
+python -m alembic revision --autogenerate -m "describe your change"
 ```
 
-### View Database Contents
-Use any SQLite viewer or command-line:
-```bash
-sqlite3 issues.db
-.tables
-SELECT * FROM issues;
+迁移前请确认 `DATABASE_URL` 指向本地开发数据库或测试数据库。
+
+## 启动 API
+
+```powershell
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-### Add More Fields
-1. Update `models.py` (add column to Issue model)
-2. Update `schemas.py` (add field to Pydantic models)
-3. Delete `issues.db` to recreate with new schema
-4. Restart the application
+启动后访问：
 
-## Common Interview Questions & Answers
+- Swagger UI：<http://127.0.0.1:8000/docs>
+- ReDoc：<http://127.0.0.1:8000/redoc>
+- OpenAPI JSON：<http://127.0.0.1:8000/openapi.json>
 
-### Q: Why use FastAPI over Flask?
-**A:** FastAPI provides:
-- Automatic API documentation (Swagger/OpenAPI)
-- Built-in data validation with Pydantic
-- Async support out of the box
-- Better performance (faster than Flask)
-- Type hints support for better IDE experience
+## API 接口
 
-### Q: What is the purpose of Pydantic schemas?
-**A:** Pydantic schemas:
-- Validate incoming data automatically
-- Provide clear API contracts
-- Separate API models from database models
-- Enable automatic API documentation
-- Type conversion and validation
+| 方法 | 路径 | 说明 | 成功状态码 |
+|---|---|---|---|
+| POST | `/experiments/` | 创建实验 | `201` |
+| GET | `/experiments/` | 查询实验列表，支持 `skip`、`limit` | `200` |
+| GET | `/experiments/{experiment_id}` | 查询单个实验 | `200` |
+| PATCH | `/experiments/{experiment_id}` | 部分更新实验 | `200` |
+| DELETE | `/experiments/{experiment_id}` | 删除实验 | `204` |
 
-### Q: Why separate models.py and schemas.py?
-**A:** Separation of concerns:
-- `models.py`: Database structure (how data is stored)
-- `schemas.py`: API interface (how data is exchanged)
-- Allows changing one without affecting the other
-- Database might have fields we don't expose via API
-- API might accept fields not stored in database
+创建请求示例：
 
-### Q: What is SQLAlchemy ORM?
-**A:** ORM (Object-Relational Mapping):
-- Write Python code instead of SQL
-- Database-agnostic (easily switch databases)
-- Prevents SQL injection
-- Provides relationships and eager loading
-- Type-safe database operations
-
-### Q: How would you add authentication?
-**A:** Several approaches:
-1. JWT tokens with OAuth2
-2. API keys
-3. Session-based auth
-4. Use libraries like `python-jose`, `passlib`
-5. Add `users` table and login endpoint
-
-### Q: How to handle database migrations?
-**A:** Use Alembic:
-```bash
-pip install alembic
-alembic init alembic
-alembic revision --autogenerate -m "Initial migration"
-alembic upgrade head
+```json
+{
+  "name": "Cell culture experiment",
+  "description": "Verify the baseline culture condition",
+  "hypothesis": "The baseline condition should remain stable",
+  "status": "planned"
+}
 ```
 
-### Q: How would you add testing?
-**A:** Use pytest:
-```python
-# test_issues.py
-from fastapi.testclient import TestClient
-from app.main import app
+部分更新示例：
 
-client = TestClient(app)
-
-def test_create_issue():
-    response = client.post("/issues/", json={
-        "title": "Test Issue",
-        "reporter": "test@example.com"
-    })
-    assert response.status_code == 201
+```json
+{
+  "name": "Updated experiment",
+  "status": "running"
+}
 ```
 
-## Next Steps / Enhancements
+常见错误：
 
-- [ ] Add user authentication and authorization
-- [ ] Implement comments on issues
-- [ ] Add file attachments
-- [ ] Email notifications
-- [ ] Search functionality
-- [ ] Audit logs
-- [ ] Rate limiting
-- [ ] Caching with Redis
-- [ ] Background tasks with Celery
-- [ ] WebSocket support for real-time updates
+- `404`：目标实验不存在；
+- `422`：请求体或查询参数不符合 Pydantic 校验规则；
+- `500`：未处理的服务器异常，应结合日志定位。
 
-## License
+## 测试
 
-MIT License - Feel free to use this project for learning and development.
+测试使用独立的内存 SQLite 数据库，不会修改开发数据库。
 
-## Support
+运行全部测试：
 
+```powershell
+python -m pytest -q
+```
 
-For questions or issues, please open an issue on GitHub or contact the maintainer.
+按测试层运行：
 
+```powershell
+python -m pytest -q tests/test_experiment_schema.py
+python -m pytest -q tests/test_experiment_repository.py
+python -m pytest -q tests/test_experiment_service.py
+python -m pytest -q tests/test_experiment_api.py
+```
+
+测试覆盖：
+
+- Schema 合法输入、默认值、空格清理和非法输入；
+- Repository 创建、查询、列表、分页、更新和删除；
+- Service 创建、查询异常、更新和删除；
+- API CRUD、404 和 422 响应。
+
+最近一次本地测试记录为全部测试通过，具体结果以当前环境运行输出为准。
+
+## PostgreSQL 本地验证
+
+已经完成以下本地验证：
+
+1. PostgreSQL 容器启动；
+2. Alembic 使用 `PostgresqlImpl`；
+3. `experiments` 表迁移成功；
+4. FastAPI 创建接口成功写入 PostgreSQL；
+5. 通过 SQL 查询确认数据已写入 `experiments` 表。
+
+## Docker
+
+仓库中准备了：
+
+- `Dockerfile`：构建 FastAPI 应用镜像；
+- `docker-compose.yml`：启动本地 PostgreSQL；
+- `.dockerignore`：避免把虚拟环境、`.env` 和测试缓存复制到镜像。
+
+当前 Docker Hub 网络连接不稳定，镜像拉取和 FastAPI 镜像构建尚未完成最终验证。网络恢复后执行：
+
+```powershell
+docker compose config --quiet
+docker compose up -d postgres
+docker build -t research-experiment-api:dev .
+```
+
+构建成功后，还需要补充 API 容器与 PostgreSQL 的 Compose 联调，并把验证结果更新到本文档。
+
+## 分层设计
+
+```text
+FastAPI Router
+    ↓
+Service
+    ↓
+Repository
+    ↓
+SQLAlchemy Session
+    ↓
+SQLite / PostgreSQL
+```
+
+- Router：处理 HTTP 参数、状态码和错误转换；
+- Service：处理业务流程、提交和回滚事务；
+- Repository：封装 SQLAlchemy 查询和持久化操作；
+- Schema：负责输入校验和 ORM 输出转换；
+- Model：描述数据库表结构。
+
+## 后续路线
+
+1. `ExperimentRun` 实验运行记录；
+2. `Metric` 实验指标；
+3. `Tag` 和实验标签关联；
+4. `ExperimentNote` 实验笔记；
+5. LLM API；
+6. Tool Calling；
+7. Agent 循环和工具错误处理；
+8. 超时、重试和日志；
+9. RAG；
+10. SSE 流式输出；
+11. Agent 评测；
+12. 权限、审计和可靠性设计。
+
+## 安全注意事项
+
+- 不要提交 `.env`；
+- 不要在日志和 README 中写数据库密码；
+- 不要把真实数据库连接信息写入测试代码；
+- 迁移和测试优先使用本地开发数据库或独立测试数据库；
+- `original-project` 与当前重构仓库分开保存。

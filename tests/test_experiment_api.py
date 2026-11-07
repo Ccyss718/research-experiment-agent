@@ -124,3 +124,15 @@ def test_delete_experiment_api(client):
     )
 
     assert get_response.status_code == 404
+
+def test_create_experiment_with_blank_name_returns_422(client):
+    response = client.post(
+        "/experiments/",
+        json={
+            "name": "   ",
+            "description": "Invalid request",
+        },
+    )
+
+    assert response.status_code == 422
+    assert isinstance(response.json()["detail"], list)
