@@ -36,7 +36,7 @@
 
 当前分支：`refactor/experiment-domain`
 
-当前 HEAD：`1141c6a docs: add agent learning context`
+项目基线提交：`1222ea3 build: add Docker Compose deployment`
 
 当前工作区：已检查为干净；本地分支包含最新上下文提交。
 
@@ -351,4 +351,5 @@ feature/agent-evaluation
 > 为 `list_experiments` 设计工具输入 Schema、输出 Schema、Service 调用约束和测试条件。
 
 不要直接开始写完整 Agent 循环。
+
 
