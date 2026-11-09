@@ -16,9 +16,8 @@
 - Repository、Service、API Router 分层；
 - SQLite 测试数据库；
 - PostgreSQL 本地环境连接和迁移验证；
-- pytest Schema、Repository、Service 和 API 测试。
-
-Docker 配置文件已经准备，但由于当前 Docker Hub 网络连接不稳定，镜像构建尚未完成最终验证。Docker 部分会在网络恢复后补充提交。
+- pytest Schema、Repository、Service 和 API 测试；
+- Docker 镜像构建和 Compose 联调。
 
 ## 技术栈
 
@@ -239,21 +238,29 @@ python -m pytest -q tests/test_experiment_api.py
 
 ## Docker
 
-仓库中准备了：
+仓库中包含：
 
 - `Dockerfile`：构建 FastAPI 应用镜像；
-- `docker-compose.yml`：启动本地 PostgreSQL；
+- `docker-compose.yml`：启动 PostgreSQL 和 FastAPI API 服务；
 - `.dockerignore`：避免把虚拟环境、`.env` 和测试缓存复制到镜像。
 
-当前 Docker Hub 网络连接不稳定，镜像拉取和 FastAPI 镜像构建尚未完成最终验证。网络恢复后执行：
+启动完整服务：
 
 ```powershell
 docker compose config --quiet
-docker compose up -d postgres
-docker build -t research-experiment-api:dev .
+docker compose up -d --build
+docker compose ps
 ```
 
-构建成功后，还需要补充 API 容器与 PostgreSQL 的 Compose 联调，并把验证结果更新到本文档。
+API 容器启动时会先执行 `alembic upgrade head`，再启动 Uvicorn。
+
+服务地址：
+
+- API：<http://127.0.0.1:8000>
+- Swagger UI：<http://127.0.0.1:8000/docs>
+- PostgreSQL：`127.0.0.1:5433`
+
+当前已验证镜像构建、PostgreSQL 健康检查、Alembic 容器迁移和 API 容器内的 `201 Created` 请求。
 
 ## 分层设计
 
